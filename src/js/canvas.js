@@ -34,35 +34,38 @@ Star.prototype.update = function() {
     this.draw();
 
     //Bola llegando al final del canvas
-    if (this.y + this.radius + this.velocity.y > canvas.height || this.y < this.radius) {
+    if (this.y + this.radius + this.velocity.y > canvas.height) {
         this.velocity.y = -this.velocity.y * this.friction;
+        this.shatter();
     }else{
         this.velocity.y += this.gravity;
-        this.shatter();
     }
     this.y += this.velocity.y;
 }
 
 Star.prototype.shatter = function(){
+    this.radius -= 3;
     for (let i = 0; i < 8; i++) {
-        miniStars.push(new MiniStar(this.x, this.y, 2, 'red'));
+        miniStars.push(new MiniStar(this.x, this.y, 2));
     }
 }
 
 function MiniStar(x, y, radius, color){
-    Star.call(this, x, y, radius, color);
 
-    this.gravity = 1;
+    Star.call(this, x, y, radius, color);
+    this.gravity = 0.1;
     this.friction = 0.8;
+    this.ttl = 500;
+    this.opacity = 1;
     this.velocity = {
         x: utils.randomIntFromRange(-5, 5),
-        y: 3
+        y: utils.randomIntFromRange(-15, 15)
     }
 
     MiniStar.prototype.draw = function() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = this.color;
+        ctx.fillStyle = `rgba(255, 0, 0, ${this.opacity})`;
         ctx.fill();
         ctx.closePath();
     }
@@ -71,13 +74,15 @@ function MiniStar(x, y, radius, color){
         this.draw();
 
         //Bola llegando al final del canvas
-        if (this.y + this.radius + this.velocity.y > canvas.height || this.y < this.radius) {
+        if (this.y + this.radius + this.velocity.y > canvas.height) {
             this.velocity.y = -this.velocity.y * this.friction;
         }else{
             this.velocity.y += this.gravity;
         }
         this.x += this.velocity.x;
         this.y += this.velocity.y;
+        this.ttl -= 1;
+        this.opacity -= 1 / this.ttl;
     }
 }
 
@@ -99,12 +104,18 @@ function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    stars.forEach(star => {
+    stars.forEach((star, index) => {
         star.update();
+        if (star.radius == 0) {
+            stars.splice(index, 1);
+        }
     });
 
-    miniStars.forEach(miniStar => {
+    miniStars.forEach((miniStar, index) => {
         miniStar.update();
+        if (miniStars.ttl == 0) {
+            miniStars.splice(index, 1);
+        }
     });
 }
 
