@@ -23,11 +23,15 @@ function Star(x, y, radius, color) {
 }
 
 Star.prototype.draw = function() {
+    ctx.save();
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
     ctx.fillStyle = this.color;
+    ctx.shadowColor = '#E3EAEF';
+    ctx.shadowBlur = 20;
     ctx.fill();
     ctx.closePath();
+    ctx.restore();
 }
 
 Star.prototype.update = function() {
@@ -63,11 +67,15 @@ function MiniStar(x, y, radius, color){
     }
 
     MiniStar.prototype.draw = function() {
+        ctx.save();
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        ctx.fillStyle = `rgba(255, 0, 0, ${this.opacity})`;
+        ctx.fillStyle = `rgba(227, 234, 239, ${this.opacity})`;
+        ctx.shadowColor = '#E3EAEF';
+        ctx.shadowBlur = 20;
         ctx.fill();
         ctx.closePath();
+        ctx.restore();
     }
 
     MiniStar.prototype.update = function() {
@@ -91,9 +99,9 @@ function createMountainRange(mountainAmount, height, color) {
         const mountainWidth = canvas.width / mountainAmount;
         ctx.beginPath();
         ctx.moveTo(i * mountainWidth, canvas.height);
-        ctx.lineTo(i * mountainWidth + mountainWidth, canvas.height);
+        ctx.lineTo(i * mountainWidth + mountainWidth + 325, canvas.height);
         ctx.lineTo(i * mountainWidth + mountainWidth / 2, canvas.height - height);
-        ctx.lineTo(i * mountainWidth, canvas.height);
+        ctx.lineTo(i * mountainWidth - 325, canvas.height);
         ctx.fillStyle = color;
         ctx.fill();
         ctx.closePath();
@@ -105,15 +113,25 @@ function createMountainRange(mountainAmount, height, color) {
 const backgroundGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
 backgroundGradient.addColorStop(0, '#171e26');
 backgroundGradient.addColorStop(1, '#3f586b');
+
 let stars;
 let miniStars;
+let backgroundStars;
 
 function init() {
     stars = [];
     miniStars = [];
+    backgroundStars = [];
 
     for (let i = 0; i < 1; i++) {
-        stars.push(new Star(canvas.width / 2, 30, 30, 'blue'));
+        stars.push(new Star(canvas.width / 2, 30, 30, '#E3EAEF'));
+    }
+
+    for (let i = 0; i < 150; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const radius = Math.random() * 3;
+        backgroundStars.push(new Star(x, y, radius, 'white'));
     }
 }
 
@@ -123,8 +141,14 @@ function animate() {
     ctx.fillStyle = backgroundGradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    createMountainRange(1, 100, 'white');
-    createMountainRange(2, 100, 'green');
+    backgroundStars.forEach(backgroundStars => {
+        backgroundStars.draw();
+    });
+
+    createMountainRange(1, canvas.height -  50, '#384551');
+    createMountainRange(2, canvas.height - 100, '#283843');
+    createMountainRange(3, canvas.height - 300, '#26333E');
+
 
     stars.forEach((star, index) => {
         star.update();
@@ -139,6 +163,8 @@ function animate() {
             miniStars.splice(index, 1);
         }
     });
+
+
 }
 
 init();
