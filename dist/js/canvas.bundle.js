@@ -140,7 +140,7 @@ Star.prototype.update = function () {
     this.draw();
 
     //Bola llegando al final del canvas
-    if (this.y + this.radius + this.velocity.y > canvas.height) {
+    if (this.y + this.radius + this.velocity.y > canvas.height - groundHeight) {
         this.velocity.y = -this.velocity.y * this.friction;
         this.shatter();
     } else {
@@ -150,6 +150,7 @@ Star.prototype.update = function () {
     //Hits side of screen
     if (this.x + this.radius + this.velocity.x > canvas.width || this.x - this.radius <= 0) {
         this.velocity.x = -this.velocity.x * this.friction;
+        this.shatter();
     }
 
     this.x += this.velocity.x;
@@ -166,9 +167,9 @@ Star.prototype.shatter = function () {
 function MiniStar(x, y, radius, color) {
 
     Star.call(this, x, y, radius, color);
-    this.gravity = 0.1;
-    this.friction = 0.8;
-    this.ttl = 500;
+    this.gravity = 0.09;
+    this.friction = 0.88;
+    this.ttl = 3;
     this.opacity = 1;
     this.velocity = {
         x: _utils2.default.randomIntFromRange(-5, 5),
@@ -191,15 +192,15 @@ function MiniStar(x, y, radius, color) {
         this.draw();
 
         //Bola llegando al final del canvas
-        if (this.y + this.radius + this.velocity.y > canvas.height) {
+        if (this.y + this.radius + this.velocity.y > canvas.height - groundHeight) {
             this.velocity.y = -this.velocity.y * this.friction;
         } else {
             this.velocity.y += this.gravity;
         }
         this.x += this.velocity.x;
         this.y += this.velocity.y;
-        this.ttl -= 1;
-        this.opacity -= 1 / this.ttl;
+        this.ttl -= 0.01;
+        this.opacity -= 1 / (this.ttl / 0.01);
     };
 }
 
@@ -227,17 +228,18 @@ var miniStars = void 0;
 var backgroundStars = void 0;
 var ticker = 0;
 var randomSpawnTime = 75;
-
+var groundHeight = 100;
 function init() {
     stars = [];
     miniStars = [];
     backgroundStars = [];
 
-    for (var i = 0; i < 1; i++) {
+    /* Estrella inicial - Conservada para posible debug/modificación en las partículas.
+    for (let i = 0; i < 1; i++) {
         stars.push(new Star(canvas.width / 2, 30, 30, '#E3EAEF'));
-    }
+    } */
 
-    for (var _i = 0; _i < 150; _i++) {
+    for (var i = 0; i < 150; i++) {
         var x = Math.random() * canvas.width;
         var y = Math.random() * canvas.height;
         var radius = Math.random() * 3;
@@ -258,6 +260,8 @@ function animate() {
     createMountainRange(1, canvas.height - 50, '#384551');
     createMountainRange(2, canvas.height - 100, '#283843');
     createMountainRange(3, canvas.height - 300, '#26333E');
+    ctx.fillStyle = "#182028";
+    ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
 
     stars.forEach(function (star, index) {
         star.update();
@@ -274,14 +278,13 @@ function animate() {
     });
 
     ticker++;
-    console.log(ticker);
 
     if (ticker % randomSpawnTime == 0) {
         var radius = 12;
         var x = Math.max(Math.random() * canvas.width - radius);
         var y = -100;
         stars.push(new Star(x, y, radius, 'white'));
-        randomSpawnTime = _utils2.default.randomIntFromRange(75, 200);
+        randomSpawnTime = _utils2.default.randomIntFromRange(175, 300);
     }
 }
 
