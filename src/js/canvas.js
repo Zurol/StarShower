@@ -117,6 +117,7 @@ backgroundGradient.addColorStop(1, '#3f586b');
 let stars;
 let miniStars;
 let backgroundStars;
+let ticker = 0;
 
 function init() {
     stars = [];
@@ -164,7 +165,14 @@ function animate() {
         }
     });
 
+    ticker++;
+    console.log(ticker);
 
+    if (ticker % 75 == 0) {
+        const x = Math.random() * canvas.width;
+        const y = -100;
+        stars.push(new Star(x, y, 30, 'white'));
+    }
 }
 
 init();
