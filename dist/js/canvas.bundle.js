@@ -189,6 +189,9 @@ function MiniStar(x, y, radius, color) {
 }
 
 // Implementation
+var backgroundGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+backgroundGradient.addColorStop(0, '#171e26');
+backgroundGradient.addColorStop(1, '#3f586b');
 var stars = void 0;
 var miniStars = void 0;
 
@@ -204,7 +207,8 @@ function init() {
 // Animation Loop
 function animate() {
     requestAnimationFrame(animate);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = backgroundGradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     stars.forEach(function (star, index) {
         star.update();
