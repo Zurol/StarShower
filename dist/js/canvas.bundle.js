@@ -119,7 +119,7 @@ function Star(x, y, radius, color) {
     this.gravity = 1;
     this.friction = 0.8;
     this.velocity = {
-        x: 0,
+        x: (Math.random() - 0.5) * 8,
         y: 3
     };
 }
@@ -146,6 +146,13 @@ Star.prototype.update = function () {
     } else {
         this.velocity.y += this.gravity;
     }
+
+    //Hits side of screen
+    if (this.x + this.radius + this.velocity.x > canvas.width || this.x - this.radius <= 0) {
+        this.velocity.x = -this.velocity.x * this.friction;
+    }
+
+    this.x += this.velocity.x;
     this.y += this.velocity.y;
 };
 
@@ -219,6 +226,7 @@ var stars = void 0;
 var miniStars = void 0;
 var backgroundStars = void 0;
 var ticker = 0;
+var randomSpawnTime = 75;
 
 function init() {
     stars = [];
@@ -268,10 +276,12 @@ function animate() {
     ticker++;
     console.log(ticker);
 
-    if (ticker % 75 == 0) {
-        var x = Math.random() * canvas.width;
+    if (ticker % randomSpawnTime == 0) {
+        var radius = 12;
+        var x = Math.max(Math.random() * canvas.width - radius);
         var y = -100;
-        stars.push(new Star(x, y, 30, 'white'));
+        stars.push(new Star(x, y, radius, 'white'));
+        randomSpawnTime = _utils2.default.randomIntFromRange(75, 200);
     }
 }
 
